@@ -8,6 +8,7 @@ from torch import Tensor
 from comfy.cli_args import args
 import base64
 from io import BytesIO
+import pyperclip
 
 class ImageLoadFromBase64:
     def __init__(self):
@@ -242,8 +243,9 @@ class ImageSaveToPath:
         return { "ui": { "images": results } }
 
 class ImageSaveAsBase64:
-    def __init__(self):
-        self.type = "output"
+    def __init__(self) -> None:
+        
+        pass
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -263,11 +265,9 @@ class ImageSaveAsBase64:
             },
         }
 
-    RETURN_TYPES = ()
+    RETURN_TYPES = ("STRING",)
 
     FUNCTION = "main"
-
-    OUTPUT_NODE = True
 
     CATEGORY = "io_helpers"
 
@@ -279,7 +279,6 @@ class ImageSaveAsBase64:
             prompt=None, 
             extra_pnginfo=None):
         
-        results = list()
         for image in images:
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
@@ -302,13 +301,9 @@ class ImageSaveAsBase64:
             image_bytes = image_stream.getvalue()
 
             # Encode the BytesIO stream content to base64
-            base64_string = "data:image/png;base64," + base64.b64encode(image_bytes).decode("utf-8") # Decode for text representation
+            base64_string = base64.b64encode(image_bytes).decode("utf-8") # Decode for text representation
 
-            results.append({
-                "base64_string": base64_string,
-            })
-
-        return { "ui": { "images": results } }
+        return (str(base64_string),)
     
 class VHSFileNamesToStrings:
     def __init__(self):
